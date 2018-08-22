@@ -22,11 +22,11 @@ import (
 
 	// RPC
 
-	"github.com/shaunmza/steemgo"
-	"github.com/shaunmza/steemgo/encoding/wif"
-	"github.com/shaunmza/steemgo/transactions"
-	"github.com/shaunmza/steemgo/transports/websocket"
-	"github.com/shaunmza/steemgo/types"
+	"github.com/goscorum/scorumgo"
+	"github.com/goscorum/scorumgo/encoding/wif"
+	"github.com/goscorum/scorumgo/transactions"
+	"github.com/goscorum/scorumgo/transports/websocket"
+	"github.com/goscorum/scorumgo/types"
 	// Vendor
 )
 
@@ -72,7 +72,7 @@ type transferStatus struct {
 	Error   string
 }
 
-var client *steemgo.Client
+var client *scorumgo.Client
 var c *Config
 var logFileName string
 
@@ -137,7 +137,7 @@ func main() {
 
 }
 
-func send(tr *transfer, client *steemgo.Client) (res string, blockId int32, trxNum int32, expired bool) {
+func send(tr *transfer, client *scorumgo.Client) (res string, blockId int32, trxNum int32, expired bool) {
 	config, err := client.Database.GetConfig()
 	if err != nil {
 		return "Could not connect (configs)", 0, 0, false
@@ -217,7 +217,7 @@ func importCsv(csvFile string) {
 	}
 
 	// Use the transport to get an RPC client.
-	client, err := steemgo.NewClient(t)
+	client, err := scorumgo.NewClient(t)
 	if err != nil {
 		fmt.Println("Could not connect (client)")
 		return
@@ -365,7 +365,7 @@ func importJson(jsonFile string) {
 	}
 
 	// Use the transport to get an RPC client.
-	client, err := steemgo.NewClient(t)
+	client, err := scorumgo.NewClient(t)
 	if err != nil {
 		fmt.Println("Could not connect (client)")
 		return
