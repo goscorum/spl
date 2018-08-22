@@ -185,7 +185,7 @@ func send(tr *transfer, client *scorumgo.Client) (res string, blockId int32, trx
 		return "Could not broadcast error is: " + err.Error(), 0, 0, false
 	}
 
-	time.Sleep(time.Duration(config.SteemitBlockInterval) * time.Second)
+	time.Sleep(time.Duration(config.ScorumBlockInterval) * time.Second)
 
 	// Success!
 	return "Sent", resp.BlockNum, resp.TrxNum, resp.Expired
@@ -255,7 +255,7 @@ func importCsv(csvFile string) {
 			ac = append(ac, strings.ToLower(strings.TrimSpace(record[0])))
 			st.Account = record[0]
 
-			acc, err := client.Database.GetAccounts(ac)
+			_, err = client.Database.GetAccounts(ac)
 			if err != nil {
 				st.Status = "Failed"
 				st.Error = "Could not fetch user details from the blockchain"
@@ -271,30 +271,6 @@ func importCsv(csvFile string) {
 					return
 				}
 				continue
-			}
-
-			rp := acc[0].Reputation
-			rpSimple := calcReputation(rp)
-
-			if rpSimple < c.MinimumReputation {
-				st.Status = "Failed"
-				st.Error = fmt.Sprintf("User reputation (%d) below Minimum reputation of %d", rpSimple, c.MinimumReputation)
-
-				ln, err := json.Marshal(st)
-				if err != nil {
-					fmt.Println("Transfer failed: " + err.Error())
-					return
-				}
-
-				err = logLine(string(ln[:]))
-				if err != nil {
-					fmt.Println("Transfer failed: " + err.Error())
-					return
-				}
-				// Send them 0.001 SBD and a message instead
-				//continue
-				record[1] = "0.001"
-				record[2] = fmt.Sprintf("Lucksacks.com payout rejected. Reason : Rep level below %d", c.MinimumReputation)
 			}
 
 			tr := &transfer{To: ac[0],
@@ -440,30 +416,6 @@ func importJson(jsonFile string) {
 				return
 			}
 			continue
-		}
-
-		rp := acc[0].Reputation
-		rpSimple := calcReputation(rp)
-
-		if rpSimple < c.MinimumReputation {
-			st.Status = "Failed"
-			st.Error = fmt.Sprintf("User reputation (%d) below Minimum reputation of %d", rpSimple, c.MinimumReputation)
-
-			ln, err := json.Marshal(st)
-			if err != nil {
-				fmt.Println("Transfer failed: " + err.Error())
-				return
-			}
-
-			err = logLine(string(ln[:]))
-			if err != nil {
-				fmt.Println("Transfer failed: " + err.Error())
-				return
-			}
-			// Send them 0.001 SBD and a message instead
-			//continue
-			record.Amount = "0.001"
-			record.Memo = fmt.Sprintf("Lucksacks.com payout rejected. Reason : Rep level below %d", c.MinimumReputation)
 		}
 
 		tr := &transfer{To: ac[0],
